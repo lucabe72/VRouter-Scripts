@@ -1,0 +1,7 @@
+How to create 2 VMs communicating between them:
+1) sh vnet-setup.sh -b -n 2 -z 0
+	Note: "-b" is bridge mode... Inportant! "-n 2" creates 2 interfaces
+2) sh setkvm.sh
+3) sh starttiny-macvtap.sh -K -n -t -i macvtap0
+4) sh starttiny-macvtap.sh -K -n -t -i macvtap1
+5) Change the IP address in the second VM before pinging...
