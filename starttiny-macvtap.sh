@@ -9,7 +9,6 @@ IFACES="macvtap0"
 KERNEL=Core/boot/vmlinuz
 CORE=Core/boot/core.gz
 
-echo TAP Number: $TAP_N
 echo $APPEND
 
 build_netcfg() {
@@ -24,6 +23,18 @@ build_netcfg() {
    done
 
   echo $CFG
+}
+
+build_redir() {
+  REDIR=""
+  FD=3
+  for i in $1
+   do
+    REDIR="$REDIR $FD<>/dev/tap$i"
+    FD=$(($FD + 1))
+   done
+
+  echo $REDIR
 }
 
 get_tap_n() {
@@ -57,32 +68,6 @@ get_n() {
    done
 }
 
-start_1nic() {
-  T=$(get_n "$TAP_N" 1)
-  $EMUL $CMD -append "$APPEND" $REDIR 3<>/dev/tap$T
-}
-
-start_2nic() {
-  T1=$(get_n "$TAP_N" 1)
-  T2=$(get_n "$TAP_N" 2)
-  $EMUL $CMD -append "$APPEND" 3<>/dev/tap$T1 4<>/dev/tap$T2
-}
-
-start_3nic() {
-  T1=$(get_n "$TAP_N" 1)
-  T2=$(get_n "$TAP_N" 2)
-  T3=$(get_n "$TAP_N" 3)
-  $EMUL $CMD -append "$APPEND" 3<>/dev/tap$T1 4<>/dev/tap$T2 5<>/dev/tap$T3
-}
-
-start_4nic() {
-  T1=$(get_n "$TAP_N" 1)
-  T2=$(get_n "$TAP_N" 2)
-  T3=$(get_n "$TAP_N" 3)
-  T4=$(get_n "$TAP_N" 4)
-  $EMUL $CMD -append "$APPEND" 3<>/dev/tap$T1 4<>/dev/tap$T2 5<>/dev/tap$T3 6<>/dev/tap$T4
-}
-
 while getopts vtkKnNei:l:c: opt
  do
   echo "Opt: $opt"
@@ -107,13 +92,8 @@ while getopts vtkKnNei:l:c: opt
 
 TAP_N=$(get_tap_n "$IFACES")
 NETCFG=$(build_netcfg "$TAP_N")
+REDIR=$(build_redir "$TAP_N")
 
 CMD="-kernel $KERNEL -initrd $CORE -m 512 -machine type=pc-1.1,accel=kvm,kernel_irqchip=on -cpu kvm32 $NETCFG -hda opt1.img $KVM $TRM"
 
-N=$(cardinality "$IFACES")
-case $N in
-  1)	start_1nic;;
-  2)	start_2nic;;
-  3)	start_3nic;;
-  4)	start_4nic;;
-esac
+eval "$EMUL $CMD -append \"$APPEND\" $REDIR"
