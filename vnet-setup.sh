@@ -1,5 +1,5 @@
 IFN=0
-MODE="bridge"
+MODE="mode bridge"
 ZCOPY=""
 ETH1_IP="NoThanks"
 HOST_BRIDGE="macvtap"
