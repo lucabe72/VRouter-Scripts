@@ -1,13 +1,15 @@
+#export LD_LIBRARY_PATH=/home/luca/lib32
 export LD_LIBRARY_PATH=$(pwd)/../lib
 NETCARD=virtio-net-pci 
 VHOST=""
 KVM=-enable-kvm
 EMUL=$(pwd)/../Public-Qemu-Test/bin/qemu-system-i386
-TRM=""
+TRM="-vnc :1"
 APPEND="nodhcp nozswap opt=sda1"
 IFACES="macvtap0"
 KERNEL=Core/boot/vmlinuz
 CORE=Core/boot/core.gz
+GUEST_IMG=""
 
 echo $APPEND
 
@@ -68,7 +70,7 @@ get_n() {
    done
 }
 
-while getopts vtkKnNei:l:c: opt
+while getopts vtkKnNei:l:c:g: opt
  do
   echo "Opt: $opt"
   case "$opt" in
@@ -82,6 +84,7 @@ while getopts vtkKnNei:l:c: opt
     i)		IFACES=$OPTARG;;
     l)		KERNEL=$OPTARG;;
     c)		CORE=$OPTARG;;
+    g)		GUEST_IMG=$OPTARG;;
     [?])	print >&2 "Usage: $0 [-e] [-n] [-N] [-k]"
 		exit 1;;
   esac
@@ -94,6 +97,12 @@ TAP_N=$(get_tap_n "$IFACES")
 NETCFG=$(build_netcfg "$TAP_N")
 REDIR=$(build_redir "$TAP_N")
 
-CMD="-kernel $KERNEL -initrd $CORE -m 512 -machine type=pc-1.1,accel=kvm,kernel_irqchip=on -cpu kvm32 $NETCFG -hda opt1.img $KVM $TRM"
+if test x$GUEST_IMG = x;
+ then
+  GUEST_CMD="-kernel $KERNEL -initrd $CORE -hda opt1.img -append \"$APPEND\""
+ else
+  GUEST_CMD="-hda $GUEST_IMG"
+ fi
+CMD="-m 512 -machine type=pc-1.1,accel=kvm,kernel_irqchip=on -cpu kvm32 $NETCFG $KVM $TRM"
 
-eval "$EMUL $CMD -append \"$APPEND\" $REDIR"
+eval "$EMUL $GUEST_CMD $CMD $REDIR"
