@@ -4,7 +4,7 @@ NETCARD=virtio-net-pci
 VHOST=""
 KVM=-enable-kvm
 EMUL=$(pwd)/../Public-Qemu-Test/bin/qemu-system-i386
-TRM="-vnc :1"
+TRM="-curses"
 APPEND="nodhcp nozswap opt=sda1"
 IFACES="macvtap0"
 KERNEL=Core/boot/vmlinuz
@@ -70,7 +70,7 @@ get_n() {
    done
 }
 
-while getopts vtkKnNei:l:c:g: opt
+while getopts v:tkKnNei:l:c:g: opt
  do
   echo "Opt: $opt"
   case "$opt" in
@@ -80,7 +80,7 @@ while getopts vtkKnNei:l:c:g: opt
     k)		EMUL=$(pwd)/../Public-KVM-Test/bin/qemu-system-x86_64;;
     K)		EMUL=$(pwd)/../Public-KVM-Test64/bin/qemu-system-x86_64;;
     t)		TRM="-curses";;
-    v)		TRM="-vnc :1";;
+    v)		TRM="-vnc :$OPTARG";;
     i)		IFACES=$OPTARG;;
     l)		KERNEL=$OPTARG;;
     c)		CORE=$OPTARG;;
