@@ -70,13 +70,14 @@ get_n() {
    done
 }
 
-while getopts v:tkKnNei:l:c:g: opt
+while getopts v:tkKnNei:l:c:g:E: opt
  do
   echo "Opt: $opt"
   case "$opt" in
     e)		NETCARD=e1000;;
     n)		VHOST=,vhost=on;;
     N)		KVM="";;
+    E)		EMUL=$OPTARG;;
     k)		EMUL=$(pwd)/../Public-KVM-Test/bin/qemu-system-x86_64;;
     K)		EMUL=$(pwd)/../Public-KVM-Test64/bin/qemu-system-x86_64;;
     t)		TRM="-curses";;
@@ -103,6 +104,6 @@ if test x$GUEST_IMG = x;
  else
   GUEST_CMD="-hda $GUEST_IMG"
  fi
-CMD="-m 512 -machine type=pc-1.1,accel=kvm,kernel_irqchip=on -cpu kvm32 $NETCFG $KVM $TRM"
+CMD="-m 512 -machine type=pc,accel=kvm -cpu kvm32 $NETCFG $KVM $TRM"
 
 eval "$EMUL $GUEST_CMD $CMD $REDIR"
