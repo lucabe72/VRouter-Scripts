@@ -31,8 +31,8 @@ macvtap_create_n() {
 
   for i in $1
    do
-    sudo /sbin/ip link add link $2 name macvtap$i type macvtap $MODE
-    sudo /sbin/ip link set macvtap$i address $MAC_PREFIX$i
+    sudo ip link add link $2 name macvtap$i type macvtap $MODE
+    sudo ip link set macvtap$i address $MAC_PREFIX$i
     sudo /sbin/ifconfig macvtap$i up
     sudo /sbin/ifconfig macvtap$i txqueuelen $QLEN
   done
