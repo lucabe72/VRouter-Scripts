@@ -10,10 +10,11 @@ IFACES="macvtap0"
 KERNEL=Core/boot/vmlinuz
 CORE=Core/boot/core.gz
 GUEST_IMG=""
+TUNTAP=""
 
 echo $APPEND
 
-build_netcfg() {
+build_netcfg_macvtap() {
   CFG=""
   FD=3
   for i in $1
@@ -22,6 +23,18 @@ build_netcfg() {
     CFG="$CFG -netdev tap,id=nic$i,fd=$FD$VHOST"
     CFG="$CFG -device $NETCARD,netdev=nic$i,mac=$MACADDR"
     FD=$(($FD + 1))
+   done
+
+  echo $CFG
+}
+
+build_netcfg_macvtap() {
+  CFG=""
+
+  for i in $1
+   do
+    CFG="$CFG -netdev tap,id=tapnic$i,ifname=$i,script=no,downscript=no$VHOST"
+    CFG="$CFG -device $NETCARD,netdev=tapnic$i"
    done
 
   echo $CFG
@@ -70,7 +83,7 @@ get_n() {
    done
 }
 
-while getopts v:tkKnNei:l:c:g:E: opt
+while getopts v:tkKnNei:l:c:g:E:I: opt
  do
   echo "Opt: $opt"
   case "$opt" in
@@ -83,6 +96,7 @@ while getopts v:tkKnNei:l:c:g:E: opt
     t)		TRM="-curses";;
     v)		TRM="-vnc :$OPTARG";;
     i)		IFACES=$OPTARG;;
+    I)		TUNTAP=$OPTARG;;
     l)		KERNEL=$OPTARG;;
     c)		CORE=$OPTARG;;
     g)		GUEST_IMG=$OPTARG;;
@@ -95,7 +109,8 @@ while getopts v:tkKnNei:l:c:g:E: opt
 #echo MAC: $MACADDR
 
 TAP_N=$(get_tap_n "$IFACES")
-NETCFG=$(build_netcfg "$TAP_N")
+NETCFG=$(build_netcfg_macvtap "$TAP_N")
+NETCFG1=$(build_netcfg_tuntap "$TUNTAP")
 REDIR=$(build_redir "$TAP_N")
 
 if test x$GUEST_IMG = x;
@@ -104,6 +119,6 @@ if test x$GUEST_IMG = x;
  else
   GUEST_CMD="-hda $GUEST_IMG"
  fi
-CMD="-m 512 -machine type=pc,accel=kvm -cpu kvm32 $NETCFG $KVM $TRM"
+CMD="-m 512 -machine type=pc,accel=kvm -cpu kvm32 $NETCFG $NETCFG1 $KVM $TRM"
 
 eval "$EMUL $GUEST_CMD $CMD $REDIR"
