@@ -20,8 +20,9 @@ eth_setup() {
 }
 
 virt_lan_setup() {
-  MYSELF=$USER
-  sudo /usr/sbin/tunctl -u $MYSELF -b -t $1
+#  MYSELF=$USER
+#  sudo /usr/sbin/tunctl -u $MYSELF -b -t $1
+  sudo ip link add name $1 type dummy
   sudo /sbin/ifconfig $1 up
 }
 
