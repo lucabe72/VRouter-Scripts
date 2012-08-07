@@ -39,16 +39,25 @@ macvtap_create_n() {
 }
 
 bridge_create() {
-  sudo /sbin/brctl addbr br0
-  sudo /usr/sbin/tunctl -u luca -b -t tap0
-  sudo /sbin/brctl addif br0 eth$IFN
-  sudo /sbin/brctl addif br0 tap0
-  sudo /sbin/ifconfig eth$IFN 0.0.0.0 promisc
-  sudo /sbin/ifconfig tap0 0.0.0.0 promisc
-  sudo /sbin/ifconfig br0 192.168.1.2
+  MYSELF=$USER
+#  sudo /sbin/brctl addbr $2
+  sudo ip link add name $2 type bridge
+  sudo /sbin/ifconfig $2 up
+  for i in $1
+   do
+#    sudo /usr/sbin/tunctl -u $MYSELF -b -t tap$i
+    sudo ip tuntap add dev tap$i mode tap user $MYSELF
+#    sudo /sbin/brctl addif br0 tap$i
+    sudo ip link set dev tap$i master $2
+    sudo /sbin/ifconfig tap$i 0.0.0.0 promisc
+   done
+
+#  sudo /sbin/brctl addif br0 eth$IFN
+#  sudo /sbin/ifconfig eth$IFN 0.0.0.0 promisc
+#  sudo /sbin/ifconfig br0 192.168.1.2
 }
 
-while getopts izvpPbB2I:n:V:m: opt
+while getopts izvpPbB:2I:n:V:m: opt
  do
   echo "Opt: $opt"
   case "$opt" in
@@ -58,7 +67,7 @@ while getopts izvpPbB2I:n:V:m: opt
     P)		MODE="mode passthru";;
     b)		MODE="mode bridge";;
     z)		ZCOPY="experimental_zcopytx=1";;
-    B)		HOST_BRIDGE="bridge";;
+    B)		HOST_BRIDGE="bridge";BRIF=$OPTARG;;
     2)		HOST_BRIDGE="macvtap2";;
     i)		ETH1_IP="YesPlease";;
     I)		IFN=$OPTARG;;
@@ -86,7 +95,8 @@ if test x$HOST_BRIDGE = xmacvtap; then
   macvtap_create_n "$I_LIST" $IF
  elif test x$HOST_BRIDGE = xbridge; then
   echo BRIDGE!
-  bridge_create
+  I_LIST=$(seq $BASE $(($BASE + $N_IF - 1)))
+  bridge_create "$I_LIST" $BRIF
  elif test x$HOST_BRIDGE = xmacvtap2; then
   echo MACVTAP2!
   macvtap_create_n "0 1" $IF
