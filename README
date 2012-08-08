@@ -1,6 +1,13 @@
 How to create 2 VMs communicating between them:
-1) sh vnet-setup.sh -b -n 2 -z 0
-	Note: "-b" is bridge mode... Inportant! "-n 2" creates 2 interfaces
+1) sh vnet-setup.sh [-B <vnet name>] [-V <vnet name>] -n 2 -z
+	Notes:
+	"-B ..." allows to create a bridge-based vnet (provides a
+        backward learning algorithm).
+	"-V ..." allows to create a vnet that is not connected with
+	any physical eth* interface.
+	"-n 2" creates 2 interfaces
+	"-z" enables an experimental zerocopy feature in vhost-net (might
+	increase performance)
 2) sh setkvm.sh
 3) sh starttiny-macvtap.sh -K -n -t -i macvtap0
 4) sh starttiny-macvtap.sh -K -n -t -i macvtap1
