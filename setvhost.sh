@@ -19,6 +19,7 @@ while getopts V:v:P:p:f: opt
     		" [-p vcpu priority]"\
     		" [-P vhost priority]"\
     		""
+    		echo >&2 " example: $0 -f opt2 -v 4 -V 8 -p 99 -P 98"
     		exit 1;;
   esac
  done
