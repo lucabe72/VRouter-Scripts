@@ -4,7 +4,7 @@ VCPUPRIORITY=99
 VHOSTPRIORITY=99
 
 
-while getopts V:v:P:p:f: opt
+while getopts V:v:P:p:f:h opt
  do
   echo "Opt: $opt"
   case "$opt" in
@@ -13,7 +13,7 @@ while getopts V:v:P:p:f: opt
     p)		VCPUPRIORITY=$OPTARG;;
     P)		VHOSTPRIORITY=$OPTARG;;
     f)		FILTER=$OPTARG;;
-    [?])	echo >&2 "Usage: $0"\
+    [h?])	echo >&2 "Usage: $0"\
     		" [-v vcpu affinity]"\
     		" [-V vhost affinity]"\
     		" [-p vcpu priority]"\
