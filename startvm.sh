@@ -11,6 +11,7 @@ KERNEL=Core/boot/vmlinuz
 CORE=Core/boot/core.gz
 GUEST_IMG=""
 TUNTAP=""
+OPT="opt1.img"
 
 echo $APPEND
 
@@ -85,7 +86,7 @@ get_n() {
    done
 }
 
-while getopts v:tkKnNei:l:c:g:E:I: opt
+while getopts v:tkKnNei:l:c:g:E:o:I: opt
  do
   echo "Opt: $opt"
   case "$opt" in
@@ -102,6 +103,7 @@ while getopts v:tkKnNei:l:c:g:E:I: opt
     l)		KERNEL=$OPTARG;;
     c)		CORE=$OPTARG;;
     g)		GUEST_IMG=$OPTARG;;
+    o)		OPT=$OPTARG;;
     [?])	print >&2 "Usage: $0 [-e] [-n] [-N] [-k]"
 		exit 1;;
   esac
@@ -117,7 +119,7 @@ REDIR=$(build_redir "$TAP_N")
 
 if test x$GUEST_IMG = x;
  then
-  GUEST_CMD="-kernel $KERNEL -initrd $CORE -hda opt1.img -append \"$APPEND\""
+  GUEST_CMD="-kernel $KERNEL -initrd $CORE -hda $OPT -append \"$APPEND\""
  else
   GUEST_CMD="-hda $GUEST_IMG"
  fi
