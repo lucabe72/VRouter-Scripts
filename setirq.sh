@@ -34,7 +34,7 @@ rx_irqs=$(get_irqs $ETH-rx)
 eth_irqs=$(get_irqs $ETH)
 if test x$tx_irqs = x; then
   echo No separate TX queue!
-  set_affinity "$eth_irqs" 1
+  set_affinity "$eth_irqs" $RX_AFF
  else
   echo Separate TX queue!
   set_affinity "$tx_irqs" $TX_AFF 
