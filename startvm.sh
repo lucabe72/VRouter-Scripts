@@ -49,7 +49,7 @@ CFG=""
    do
     ID=$(echo $i | cut -d 'e' -f 2)
     MACADDR=00:16:35:AF:94:4$ID
-    CFG="$CFG -net nic,model=e1000,macaddr=$MACADDR -net netmap,ifname=$i"
+    CFG="$CFG -net nic,model=$NETCARD,macaddr=$MACADDR -net netmap,ifname=$i"
    done
 
   echo $CFG
