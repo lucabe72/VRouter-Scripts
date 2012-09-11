@@ -15,6 +15,19 @@ OPT="opt1.img"
 
 echo $APPEND
 
+build_netcfg_netmap(){
+CFG=""
+  for i in $1
+   do
+    ID=$(echo $i | cut -d 'e' -f 2)
+    MACADDR=00:16:35:AF:94:4$ID
+    CFG="$CFG -net nic,model=e1000,macaddr=$MACADDR -net netmap,ifname=$i"
+   done
+
+  echo $CFG
+}
+
+
 build_netcfg_macvtap() {
   CFG=""
   FD=3
@@ -86,7 +99,7 @@ get_n() {
    done
 }
 
-while getopts v:tkKnNei:l:c:g:E:o:I: opt
+while getopts v:tkKnNei:l:c:g:E:o:I:p: opt
  do
   echo "Opt: $opt"
   case "$opt" in
@@ -104,6 +117,7 @@ while getopts v:tkKnNei:l:c:g:E:o:I: opt
     c)		CORE=$OPTARG;;
     g)		GUEST_IMG=$OPTARG;;
     o)		OPT=$OPTARG;;
+    p)          NETMAPBASE=$OPTARG;;
     [?])	print >&2 "Usage: $0 [-e] [-n] [-N] [-k]"
 		exit 1;;
   esac
@@ -112,6 +126,7 @@ while getopts v:tkKnNei:l:c:g:E:o:I: opt
 #MACADDR=$(echo $(ip link show | grep -A 1 $TAP_N: | tail -n 1) | cut -d ' ' -f 2)
 #echo MAC: $MACADDR
 
+NETCFG2=$(build_netcfg_netmap "$NETMAPBASE")
 TAP_N=$(get_tap_n "$IFACES")
 NETCFG=$(build_netcfg_macvtap "$TAP_N")
 NETCFG1=$(build_netcfg_tuntap "$TUNTAP")
@@ -123,6 +138,6 @@ if test x$GUEST_IMG = x;
  else
   GUEST_CMD="-hda $GUEST_IMG"
  fi
-CMD="-m 512 -machine type=pc,accel=kvm -cpu kvm32 $NETCFG $NETCFG1 $KVM $TRM"
+CMD="-m 512 -machine type=pc,accel=kvm -cpu kvm32 $NETCFG $NETCFG1 $NETCFG2 $KVM $TRM"
 
 eval "$EMUL $GUEST_CMD $CMD $REDIR"
