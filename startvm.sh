@@ -15,19 +15,6 @@ OPT="opt1.img"
 
 echo $APPEND
 
-build_netcfg_netmap(){
-CFG=""
-  for i in $1
-   do
-    ID=$(echo $i | cut -d 'e' -f 2)
-    MACADDR=00:16:35:AF:94:4$ID
-    CFG="$CFG -net nic,model=e1000,macaddr=$MACADDR -net netmap,ifname=$i"
-   done
-
-  echo $CFG
-}
-
-
 build_netcfg_macvtap() {
   CFG=""
   FD=3
@@ -51,6 +38,18 @@ build_netcfg_tuntap() {
     MACADDR=00:16:35:AF:94:4$ID
     CFG="$CFG -netdev tap,id=tapnic$i,ifname=$i,script=no,downscript=no$VHOST"
     CFG="$CFG -device $NETCARD,netdev=tapnic$i,mac=$MACADDR"
+   done
+
+  echo $CFG
+}
+
+build_netcfg_netmap() {
+CFG=""
+  for i in $1
+   do
+    ID=$(echo $i | cut -d 'e' -f 2)
+    MACADDR=00:16:35:AF:94:4$ID
+    CFG="$CFG -net nic,model=e1000,macaddr=$MACADDR -net netmap,ifname=$i"
    done
 
   echo $CFG
@@ -126,10 +125,10 @@ while getopts v:tkKnNei:l:c:g:E:o:I:p: opt
 #MACADDR=$(echo $(ip link show | grep -A 1 $TAP_N: | tail -n 1) | cut -d ' ' -f 2)
 #echo MAC: $MACADDR
 
-NETCFG2=$(build_netcfg_netmap "$NETMAPBASE")
 TAP_N=$(get_tap_n "$IFACES")
 NETCFG=$(build_netcfg_macvtap "$TAP_N")
 NETCFG1=$(build_netcfg_tuntap "$TUNTAP")
+NETCFG2=$(build_netcfg_netmap "$NETMAPBASE")
 REDIR=$(build_redir "$TAP_N")
 
 if test x$GUEST_IMG = x;
