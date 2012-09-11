@@ -28,7 +28,7 @@ build_netcfg_macvtap() {
   echo $CFG
 }
 
-build_netcfg_macvtap() {
+build_netcfg_tuntap() {
   CFG=""
 
   for i in $1
