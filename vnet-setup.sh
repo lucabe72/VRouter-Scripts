@@ -4,7 +4,7 @@ MODE="mode bridge"
 ZCOPY=""
 ETH1_IP="NoThanks"
 HOST_BRIDGE="macvtap"
-QLEN=20000 #FIXME!
+QLEN=1000 #FIXME!
 MACADDR=00:16:35:AF:94:40
 MAC_PREFIX=00:16:35:AF:94:4
 N_IF=1
@@ -35,7 +35,7 @@ macvtap_create_n() {
     sudo ip link add link $2 name macvtap$i type macvtap $MODE
     sudo ip link set macvtap$i address $MAC_PREFIX$i
     sudo /sbin/ifconfig macvtap$i up
-    sudo /sbin/ifconfig macvtap$i txqueuelen $QLEN
+#    sudo /sbin/ifconfig macvtap$i txqueuelen $QLEN
   done
 }
 
