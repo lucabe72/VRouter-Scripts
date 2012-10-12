@@ -10,11 +10,11 @@ MAC_PREFIX=00:16:35:AF:94:4
 N_IF=1
 
 eth_setup() {
-  if test $ETH1_IP = YesPlease;
+  if test $ETH1_IP = NoThanks;
    then
-    sudo /sbin/ifconfig eth$IFN 192.168.1.2
+    sudo /sbin/ifconfig eth$IFN up
    else
-    sudo /sbin/ifconfig eth$IFN 0.0.0.0 
+    sudo /sbin/ifconfig eth$IFN $ETH1_IP 
    fi
   sudo ethtool -A eth$IFN autoneg off rx off tx off
 }
@@ -58,7 +58,7 @@ bridge_create() {
 #  sudo /sbin/ifconfig br0 192.168.1.2
 }
 
-while getopts izvpPbB:2I:n:V:m: opt
+while getopts i:zvpPbB:2I:n:V:m: opt
  do
   echo "Opt: $opt"
   case "$opt" in
@@ -70,7 +70,7 @@ while getopts izvpPbB:2I:n:V:m: opt
     z)		ZCOPY="experimental_zcopytx=1";;
     B)		HOST_BRIDGE="bridge";BRIF=$OPTARG;;
     2)		HOST_BRIDGE="macvtap2";;
-    i)		ETH1_IP="YesPlease";;
+    i)		ETH1_IP=$OPTARG;;
     I)		IFN=$OPTARG;;
     n)		N_IF=$OPTARG;;
     m)		BASE=$OPTARG;;
