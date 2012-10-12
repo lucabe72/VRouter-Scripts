@@ -13,7 +13,7 @@ TXAFF="-t 2"
 sh vnet-setup.sh -z -I $1
 sh setkvm.sh
 sudo ethtool -A eth$1 autoneg off rx off tx off
-sh startvm.sh -k -n -v &
+sh startvm.sh -k -n -v 1 &
 sleep 5
 sync
 sh setvhost.sh $VCPUAFF
