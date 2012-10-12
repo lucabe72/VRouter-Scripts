@@ -1,3 +1,5 @@
+export PATH=$PATH:/home/$USER/bin
+
 if test x$1 = x; then
   echo "Specify the interface number!!!"
   exit
