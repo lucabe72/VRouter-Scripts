@@ -48,8 +48,8 @@ for vhostpid in $vhostpids
   sudo taskset -p $VHOSTAFFINITY $vhostpid
  done
 
-for kvmpid in $kvmpids
- do
-  sudo chrt -f -p $VHOSTPRIORITY $kvmpid
-  sudo taskset -p $VHOSTAFFINITY $kvmpid
- done
+#for kvmpid in $kvmpids
+# do
+#  sudo chrt -f -p $VHOSTPRIORITY $kvmpid
+#  sudo taskset -p $VHOSTAFFINITY $kvmpid
+# done
