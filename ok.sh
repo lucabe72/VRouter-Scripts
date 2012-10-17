@@ -14,7 +14,7 @@ sh vnet-setup.sh -z -I $1
 sh setkvm.sh
 sudo ethtool -A eth$1 autoneg off rx off tx off
 sh startvm.sh -k -n -v 1 &
-sleep 5
+sleep 30
 sync
 sh setvhost.sh $VCPUAFF
 sudo sh setirq.sh -i $1 $RXAFF $TXAFF
