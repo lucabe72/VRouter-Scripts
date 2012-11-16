@@ -38,13 +38,23 @@ echo vcpu PIDs: $vcpupids
 
 for vcpupid in $vcpupids
  do
-  sudo chrt -f -p $VCPUPRIORITY $vcpupid
+  if [ $VCPUPRIORITY = "0" ];
+   then
+    sudo chrt -o -p 0 $vcpupid
+   else
+    sudo chrt -f -p $VCPUPRIORITY $vcpupid
+   fi
   sudo taskset -p $VCPUAFFINITY $vcpupid
  done
 
 for vhostpid in $vhostpids
  do
-  sudo chrt -f -p $VHOSTPRIORITY $vhostpid
+  if [ $VHOSTPRIORITY = "0" ];
+   then
+    sudo chrt -o -p 0 $vhostpid
+   else
+    sudo chrt -f -p $VHOSTPRIORITY $vhostpid
+   fi
   sudo taskset -p $VHOSTAFFINITY $vhostpid
  done
 
