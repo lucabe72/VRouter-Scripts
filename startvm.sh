@@ -1,5 +1,5 @@
 #export LD_LIBRARY_PATH=/home/luca/lib32
-export LD_LIBRARY_PATH=$(pwd)/../lib
+export LD_LIBRARY_PATH=$(pwd)/../lib64:$(pwd)/../lib
 NETCARD=virtio-net-pci 
 VHOST=""
 KVM=-enable-kvm
