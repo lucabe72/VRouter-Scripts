@@ -1,0 +1,51 @@
+addcpu() {
+  if [ x$1 = x ] 
+   then
+    echo $2
+   else
+    echo $1,$2
+   fi
+}
+
+mask2list() {
+CPU=$(seq 0 15)
+  for c in $CPU
+   do
+    tmp=$(($1 & 1 << c))  
+    if [ $tmp -ne 0 ]
+     then
+      SET=$(addcpu "$SET" $c)
+     fi
+   done
+  echo $SET
+}
+
+cpuset_check() {
+  [ -f /dev/cpuset/ ]     || mkdir /dev/cpuset
+  [ -f /dev/cpuset/cpus ] || /bin/mount -t cpuset cpuset /dev/cpuset
+}
+
+check_cpu() {
+  [ -f /dev/cpuset/CPU$1 ] || mkdir /dev/cpuset/CPU$1
+  echo $1 > /dev/cpuset/CPU$1/cpus
+}
+
+set_affinity() {
+  echo $1 > /dev/cpuset/CPU$2/tasks
+}
+
+P=$1
+CPUS=$(mask2list $2)
+PID=$3
+if [ $P != "-p" ]
+ then
+  echo "Usage: $0 -p <affinity> <PID>"
+
+echo $P
+echo $CPUS
+echo $PID
+  exit
+ fi
+cpuset_check
+check_cpu $CPUS
+set_affinity $PID $CPUS
