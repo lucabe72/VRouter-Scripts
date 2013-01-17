@@ -3,6 +3,7 @@ export LD_LIBRARY_PATH=$(pwd)/../lib64:$(pwd)/../lib
 NETCARD=virtio-net-pci 
 VHOST=""
 KVM=-enable-kvm
+CPU=kvm32
 EMUL=$(pwd)/../Public-Qemu-Test/bin/qemu-system-i386
 TRM="-curses"
 APPEND="nodhcp nozswap opt=sda1 user=vrouter home=sda1"
@@ -14,6 +15,19 @@ TUNTAP=""
 OPT="opt1.img"
 
 echo $APPEND
+
+build_machinecfg() {
+  CPU=$1
+  CFG=""
+
+  CFG="$CFG -m 512 -machine type=pc,accel=kvm"
+  if test x$CPU != x;
+   then
+    CFG="$CFG -cpu $CPU"
+   fi
+
+  echo $CFG
+}
 
 build_netcfg_macvtap() {
   CFG=""
@@ -100,13 +114,14 @@ get_n() {
    done
 }
 
-while getopts v:tkKnNei:l:c:g:E:o:I:p: opt
+while getopts v:tkKnNei:l:c:g:C:E:o:I:p: opt
  do
   echo "Opt: $opt"
   case "$opt" in
     e)		NETCARD=e1000;;
     n)		VHOST=,vhost=on;;
     N)		KVM="";;
+    C)		CPU=$OPTARG;;
     E)		EMUL=$OPTARG;;
     k)		EMUL=$(pwd)/../Public-KVM-Test/bin/qemu-system-x86_64;;
     K)		EMUL=$(pwd)/../Public-KVM-Test64/bin/qemu-system-x86_64;;
@@ -128,6 +143,7 @@ while getopts v:tkKnNei:l:c:g:E:o:I:p: opt
 #echo MAC: $MACADDR
 
 TAP_N=$(get_tap_n "$IFACES")
+MACHINECFG=$(build_machinecfg "$CPU")
 NETCFG=$(build_netcfg_macvtap "$TAP_N")
 NETCFG1=$(build_netcfg_tuntap "$TUNTAP")
 NETCFG2=$(build_netcfg_netmap "$NETMAPBASE")
@@ -139,6 +155,6 @@ if test x$GUEST_IMG = x;
  else
   GUEST_CMD="-hda $GUEST_IMG"
  fi
-CMD="-m 512 -machine type=pc,accel=kvm -cpu kvm32 $NETCFG $NETCFG1 $NETCFG2 $KVM $TRM"
+CMD="$MACHINECFG $NETCFG $NETCFG1 $NETCFG2 $KVM $TRM"
 
 eval "$EMUL $GUEST_CMD $CMD $REDIR"
