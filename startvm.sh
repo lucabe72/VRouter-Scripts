@@ -3,7 +3,7 @@ export LD_LIBRARY_PATH=$(pwd)/../lib64:$(pwd)/../lib
 NETCARD=virtio-net-pci 
 VHOST=""
 KVM=-enable-kvm
-CPU=kvm32
+CPU=""
 EMUL=$(pwd)/../Public-Qemu-Test/bin/qemu-system-i386
 TRM="-curses"
 APPEND="nodhcp nozswap opt=sda1 user=vrouter home=sda1"
