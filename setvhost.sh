@@ -4,16 +4,24 @@ VCPUPRIORITY=99
 VHOSTPRIORITY=99
 
 
-while getopts V:v:P:p:f:h opt
+while getopts q:t:Q:T:V:v:P:p:f:h opt
  do
   echo "Opt: $opt"
   case "$opt" in
+    q)		VCPUBUDGET=$OPTARG;;
+    t)		VCPUPERIOD=$OPTARG;;
+    Q)		VHOSTBUDGET=$OPTARG;;
+    T)		VHOSTPERIOD=$OPTARG;;
     v)		VCPUAFFINITY=$OPTARG;;
     V)		VHOSTAFFINITY=$OPTARG;;
     p)		VCPUPRIORITY=$OPTARG;;
     P)		VHOSTPRIORITY=$OPTARG;;
     f)		FILTER=$OPTARG;;
     [h?])	echo >&2 "Usage: $0"\
+    		" [-q vcpu maximum budget]"\
+    		" [-t vcpu server period]"\
+    		" [-Q vhost maximum budget]"\
+    		" [-T vhost server period]"\
     		" [-v vcpu affinity]"\
     		" [-V vhost affinity]"\
     		" [-p vcpu priority]"\
@@ -38,24 +46,34 @@ echo vcpu PIDs: $vcpupids
 
 for vcpupid in $vcpupids
  do
-  if [ $VCPUPRIORITY = "0" ];
-   then
-    sudo chrt -o -p 0 $vcpupid
-   else
-    sudo chrt -f -p $VCPUPRIORITY $vcpupid
-   fi
   sudo taskset -p $VCPUAFFINITY $vcpupid
+  if [ x$VCPUBUDGET = x ]
+   then
+    if [ $VCPUPRIORITY = "0" ];
+     then
+      sudo chrt -o -p 0 $vcpupid
+     else
+      sudo chrt -f -p $VCPUPRIORITY $vcpupid
+     fi
+   else
+    chdl $vcpupid $VCPUBUDGET $VCPUPERIOD
+   fi
  done
 
 for vhostpid in $vhostpids
  do
-  if [ $VHOSTPRIORITY = "0" ];
-   then
-    sudo chrt -o -p 0 $vhostpid
-   else
-    sudo chrt -f -p $VHOSTPRIORITY $vhostpid
-   fi
   sudo taskset -p $VHOSTAFFINITY $vhostpid
+  if [ x$VHOSTBUDGET = x ]
+   then
+    if [ $VHOSTPRIORITY = "0" ];
+     then
+      sudo chrt -o -p 0 $vhostpid
+     else
+      sudo chrt -f -p $VHOSTPRIORITY $vhostpid
+     fi
+   else
+    chdl $vhostpid $VHOSTBUDGET $VHOSTPERIOD
+   fi
  done
 
 #for kvmpid in $kvmpids
