@@ -48,7 +48,7 @@ build_netcfg_tuntap() {
 
   for i in $1
    do
-    ID=$(echo $i | cut - -d 'p' -f 2)
+    ID=$(echo ${i##*[a-z]})
     MACADDR=00:16:35:AF:94:4$ID
     CFG="$CFG -netdev tap,id=tapnic$i,ifname=$i,script=no,downscript=no$VHOST"
     CFG="$CFG -device $NETCARD,netdev=tapnic$i,mac=$MACADDR"
@@ -61,7 +61,7 @@ build_netcfg_netmap() {
 CFG=""
   for i in $1
    do
-    ID=$(echo $i | cut -d 'e' -f 2)
+    ID=$(echo ${i##*[a-z]})
     MACADDR=00:16:35:AF:94:4$ID
     #CFG="$CFG -net nic,model=$NETCARD,macaddr=$MACADDR -net netmap,ifname=$i"
     CFG="$CFG -netdev netmap,id=netmap$i,ifname=$i"
