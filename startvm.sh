@@ -34,7 +34,7 @@ build_netcfg_macvtap() {
   FD=3
   for i in $1
    do
-    MACADDR=$(echo $(ip link show | grep -A 1 "$i: " | tail -n 1) | cut -d ' ' -f 2)
+    MACADDR=$(echo $(ip link show | grep -A 1 "^$i: " | tail -n 1) | cut -d ' ' -f 2)
     CFG="$CFG -netdev tap,id=nic$i,fd=$FD$VHOST"
     CFG="$CFG -device $NETCARD,netdev=nic$i,mac=$MACADDR"
     FD=$(($FD + 1))
