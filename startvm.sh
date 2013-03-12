@@ -65,7 +65,7 @@ CFG=""
     MACADDR=00:16:35:AF:94:4$ID
     #CFG="$CFG -net nic,model=$NETCARD,macaddr=$MACADDR -net netmap,ifname=$i"
     CFG="$CFG -netdev netmap,id=netmap$i,ifname=$i"
-    CFG="$CFG -device $NETCARD,netdev==netmap$i,mac=$MACADDR"
+    CFG="$CFG -device $NETCARD,netdev=netmap$i,mac=$MACADDR"
    done
 
   echo $CFG
