@@ -6,7 +6,7 @@ KVM=-enable-kvm
 CPU=""
 EMUL=$(pwd)/../Public-Qemu-Test/bin/qemu-system-i386
 TRM="-curses"
-APPEND="nodhcp nozswap opt=sda1 user=vrouter home=sda1"
+APPEND="nodhcp nozswap opt=sda1 user=vrouter home=sda1 waitusb=5"
 IFACES="macvtap0"
 KERNEL=Core/boot/vmlinuz
 CORE=Core/boot/core.gz
