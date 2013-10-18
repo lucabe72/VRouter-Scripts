@@ -114,7 +114,7 @@ get_n() {
    done
 }
 
-while getopts v:tkKnNei:l:c:g:C:E:o:I:p: opt
+while getopts v:t:kKnNei:l:c:g:C:E:o:I:p: opt
  do
   echo "Opt: $opt"
   case "$opt" in
@@ -125,7 +125,7 @@ while getopts v:tkKnNei:l:c:g:C:E:o:I:p: opt
     E)		EMUL=$OPTARG;;
     k)		EMUL=$(pwd)/../Public-KVM-Test/bin/qemu-system-x86_64;;
     K)		EMUL=$(pwd)/../Public-KVM-Test64/bin/qemu-system-x86_64;;
-    t)		TRM="-curses";;
+    t)		TRM="-curses"; sudo chown vrouter /dev/tty$OPTARG; TRMREDIR="</dev/tty$OPTARG >/dev/tty$OPTARG 2>/dev/tty$OPTARG";;
     v)		TRM="-vnc :$OPTARG";;
     i)		IFACES=$OPTARG;;
     I)		TUNTAP=$OPTARG;;
@@ -157,4 +157,4 @@ if test x$GUEST_IMG = x;
  fi
 CMD="$MACHINECFG $NETCFG $NETCFG1 $NETCFG2 $KVM $TRM"
 
-eval "$EMUL $GUEST_CMD $CMD $REDIR"
+eval "$EMUL $GUEST_CMD $CMD $REDIR $TRMREDIR"
