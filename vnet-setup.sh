@@ -42,6 +42,8 @@ macvtap_create_n() {
 
 bridge_create() {
   MYSELF=$USER
+  sudo /sbin/modprobe vhost-net $ZCOPY
+
 #  sudo /sbin/brctl addbr $2
   sudo ip link add name $2 type bridge
   sudo ip link set dev $2 up
