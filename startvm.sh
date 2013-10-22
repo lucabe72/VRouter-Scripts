@@ -115,7 +115,7 @@ get_n() {
    done
 }
 
-while getopts v:t:kKnNei:l:c:g:C:E:o:I:p:q: opt
+while getopts v:t:kKnNei:l:c:g:C:E:o:I:p:a:q: opt
  do
   echo "Opt: $opt"
   case "$opt" in
@@ -136,6 +136,7 @@ while getopts v:t:kKnNei:l:c:g:C:E:o:I:p:q: opt
     o)		OPT=$OPTARG;;
     q)		OPTQCOW=$OPTARG;;
     p)          NETMAPBASE=$OPTARG;;
+    a)          APPEND="$APPEND $OPTARG";;
     [?])	print >&2 "Usage: $0 [-e] [-n] [-N] [-k]"
 		exit 1;;
   esac
