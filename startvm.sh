@@ -13,6 +13,7 @@ CORE=Core/boot/core.gz
 GUEST_IMG=""
 TUNTAP=""
 OPT="opt1.img"
+OPTQCOW=""
 
 echo $APPEND
 
@@ -114,7 +115,7 @@ get_n() {
    done
 }
 
-while getopts v:t:kKnNei:l:c:g:C:E:o:I:p: opt
+while getopts v:t:kKnNei:l:c:g:C:E:o:I:p:q: opt
  do
   echo "Opt: $opt"
   case "$opt" in
@@ -133,6 +134,7 @@ while getopts v:t:kKnNei:l:c:g:C:E:o:I:p: opt
     c)		CORE=$OPTARG;;
     g)		GUEST_IMG=$OPTARG;;
     o)		OPT=$OPTARG;;
+    q)		OPTQCOW=$OPTARG;;
     p)          NETMAPBASE=$OPTARG;;
     [?])	print >&2 "Usage: $0 [-e] [-n] [-N] [-k]"
 		exit 1;;
@@ -148,6 +150,12 @@ NETCFG=$(build_netcfg_macvtap "$TAP_N")
 NETCFG1=$(build_netcfg_tuntap "$TUNTAP")
 NETCFG2=$(build_netcfg_netmap "$NETMAPBASE")
 REDIR=$(build_redir "$TAP_N")
+
+if test x$OPTQCOW != x;
+ then
+  $(dirname $EMUL)/qemu-img create -f qcow2 -b $OPT $OPTQCOW
+   OPT=$OPTQCOW
+fi
 
 if test x$GUEST_IMG = x;
  then
