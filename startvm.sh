@@ -125,7 +125,7 @@ get_n() {
    done
 }
 
-while getopts v:t:kKnNei:l:c:g:C:E:o:I:p:a:q: opt
+while getopts v:t:kKnNei:l:c:g:C:E:o:I:p:a:q:f:x: opt
  do
   echo "Opt: $opt"
   case "$opt" in
@@ -145,8 +145,10 @@ while getopts v:t:kKnNei:l:c:g:C:E:o:I:p:a:q: opt
     g)		GUEST_IMG=$OPTARG;;
     o)		OPT=$OPTARG;;
     q)		OPTQCOW=$OPTARG;;
+    f)		FSDEV_DIR=$OPTARG;;
     p)          NETMAPBASE=$OPTARG;;
     a)          APPEND="$APPEND $OPTARG";;
+    x)		XTRA=$OPTARG;;
     [?])	print >&2 "Usage: $0 [-e] [-n] [-N] [-k]"
 		exit 1;;
   esac
@@ -174,6 +176,19 @@ if test x$GUEST_IMG = x;
  else
   GUEST_CMD="-hda $GUEST_IMG"
  fi
+
+if test x$FSDEV_DIR != x;
+ then
+  #GUEST_CMD="$GUEST_CMD -fsdev local,id=test_dev,path=$FSDEV_DIR,security_model=none"
+  GUEST_CMD="$GUEST_CMD -virtfs local,path=$FSDEV_DIR,security_model=passthrough,mount_tag=host_share"
+ fi
+
+if test "x$XTRA" != "x";
+ then
+  GUEST_CMD="$GUEST_CMD $XTRA"
+ fi
+
 CMD="$MACHINECFG $NETCFG $NETCFG1 $NETCFG2 $KVM $TRM"
 
+echo "$EMUL $GUEST_CMD $CMD $REDIR" $TRMREDIR"
 eval "$EMUL $GUEST_CMD $CMD $REDIR $TRMREDIR"
