@@ -50,7 +50,12 @@ build_netcfg_tuntap() {
   for i in $1
    do
     ID=$(echo ${i##*[a-z]})
-    MACADDR=00:16:35:AF:94:4$ID
+    if test $ID -le 9
+     then
+      MACADDR=00:16:35:AF:94:0$ID
+     else
+      MACADDR=00:16:35:AF:94:$ID
+     fi
     CFG="$CFG -netdev tap,id=tapnic$i,ifname=$i,script=no,downscript=no$VHOST"
     CFG="$CFG -device $NETCARD,netdev=tapnic$i,mac=$MACADDR"
    done
