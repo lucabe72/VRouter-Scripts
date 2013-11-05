@@ -68,7 +68,12 @@ CFG=""
   for i in $1
    do
     ID=$(echo ${i##*[a-z]})
-    MACADDR=00:16:35:AF:94:4$ID
+    if test $ID -le 9
+     then
+      MACADDR=00:16:35:AF:94:0$ID
+     else
+      MACADDR=00:16:35:AF:94:$ID
+     fi
     #CFG="$CFG -net nic,model=$NETCARD,macaddr=$MACADDR -net netmap,ifname=$i"
     CFG="$CFG -netdev netmap,id=netmap$i,ifname=$i"
     CFG="$CFG -device $NETCARD,netdev=netmap$i,mac=$MACADDR"
