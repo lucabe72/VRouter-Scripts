@@ -59,7 +59,7 @@ bridge_create() {
    done
 }
 
-while getopts i:zvpPbB:2I:n:V:m: opt
+while getopts i:zvpPbB:I:n:V:m: opt
  do
   echo "Opt: $opt"
   case "$opt" in
@@ -70,7 +70,6 @@ while getopts i:zvpPbB:2I:n:V:m: opt
     b)		MODE="mode bridge";;
     z)		ZCOPY="experimental_zcopytx=1";;
     B)		HOST_BRIDGE="bridge";BRIF=$OPTARG;;
-    2)		HOST_BRIDGE="macvtap2";;
     i)		ETH1_IP=$OPTARG;;
     I)		IFN=$OPTARG;;
     n)		N_IF=$OPTARG;;
@@ -81,17 +80,17 @@ while getopts i:zvpPbB:2I:n:V:m: opt
  done
 
 echo VL: $VIRT_LAN
-if test x$VIRT_LAN = x;
- then
-  eth_setup
-  IF=eth$IFN
- else
-  echo Virt Lan $VIRT_LAN
-  virt_lan_setup $VIRT_LAN
-  IF=$VIRT_LAN
- fi
 
 if test x$HOST_BRIDGE = xmacvtap; then
+  if test x$VIRT_LAN = x;
+   then
+    eth_setup
+    IF=eth$IFN
+   else
+    echo Virt Lan $VIRT_LAN
+    virt_lan_setup $VIRT_LAN
+    IF=$VIRT_LAN
+   fi
   echo MACVTAP, $N_IF interfaces!
   I_LIST=$(seq $BASE $(($BASE + $N_IF - 1)))
   macvtap_create_n "$I_LIST" $IF
@@ -99,9 +98,6 @@ if test x$HOST_BRIDGE = xmacvtap; then
   echo BRIDGE!
   I_LIST=$(seq $BASE $(($BASE + $N_IF - 1)))
   bridge_create "$I_LIST" $BRIF
- elif test x$HOST_BRIDGE = xmacvtap2; then
-  echo MACVTAP2!
-  macvtap_create_n "0 1" $IF
  else
   echo Unknown host bridge type $HOST_BRIDGE
  fi
