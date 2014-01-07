@@ -8,6 +8,18 @@ QLEN=1000 #FIXME!
 MAC_PREFIX=00:16:35:AF:94:4
 N_IF=1
 
+OVS_HOME=/home/vrouter/Public-OpenVSwitch
+export PATH=$PATH:$OVS_HOME/sbin:$OVS_HOME/bin
+
+ovs_setup() {
+  sudo /sbin/modprobe openvswitch
+  sudo rm -f $OVS_HOME/etc/openvswitch/conf.db
+  sudo ovsdb-tool create $OVS_HOME/etc/openvswitch/conf.db $OVS_HOME/share/openvswitch/vswitch.ovsschema
+  sudo ovs-vsctl --no-wait init
+  sudo ovsdb-server --remote=punix:$OVS_HOME/var/run/openvswitch/db.sock --pidfile --detach
+  sudo ovs-vswitchd --pidfile --detach
+}
+
 eth_setup() {
   if test $ETH1_IP = NoThanks;
    then
@@ -67,6 +79,30 @@ bridge_add_iface() {
    done
 }
 
+ovs_create() {
+  MYSELF=$USER
+  sudo /sbin/modprobe vhost-net $ZCOPY
+
+  sudo ovs-vsctl add-br $2 
+  sudo ip link set dev $2 up
+  for i in $1
+   do
+    sudo ip tuntap add dev tap$i mode tap user $MYSELF
+    sudo ovs-vsctl add-port $2 tap$i
+    sudo ip link set dev tap$i promisc on
+    sudo ip link set dev tap$i up 
+   done
+}
+
+ovs_add_iface() {
+  for i in $1
+   do
+    sudo ovs-vsctl add-port $2 eth$i
+    sudo ip link set dev eth$i promisc on
+    sudo ip link set dev eth$i up
+   done
+}
+
 is_list() {
   TMP=$(echo $1 | cut -d ' ' -f 1 -)
   if test "$1" = $TMP;
@@ -77,7 +113,16 @@ is_list() {
   fi
 }
 
-while getopts i:zvpPbB:I:n:V:m: opt
+is_running() {
+  if test echo $(ps ax | grep $1 | wc -l) = 2;
+   then
+    echo Yes
+   else
+    echo No
+   fi
+}
+
+while getopts i:zvpPbB:I:n:V:m:O: opt
  do
   echo "Opt: $opt"
   case "$opt" in
@@ -88,6 +133,7 @@ while getopts i:zvpPbB:I:n:V:m: opt
     b)		MODE="mode bridge";;
     z)		ZCOPY="experimental_zcopytx=1";;
     B)		HOST_BRIDGE="bridge";BRIF=$OPTARG;;
+    O)		HOST_BRIDGE="ovs";BRIF=$OPTARG;;
     i)		ETH1_IP=$OPTARG;;
     I)		IFN=$OPTARG;;
     n)		N_IF=$OPTARG;;
@@ -131,6 +177,14 @@ if test x$HOST_BRIDGE = xmacvtap; then
   echo BRIDGE!
   bridge_create "$I_LIST" $BRIF
   bridge_add_iface "$IFN" $BRIF
+ elif test x$HOST_BRIDGE = ovs; then
+  echo OpenVswitch!
+  if test $(is_running ovs-vswitchd) = No;
+   then
+    ovs_setup
+   fi
+  ovs_create "$I_LIST" $BRIF
+  ovs_add_iface "$IFN" $BRIF
  else
   echo Unknown host bridge type $HOST_BRIDGE
  fi
