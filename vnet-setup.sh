@@ -1,4 +1,4 @@
-IFN=0
+#IFN=0
 BASE=0
 MODE="mode bridge"
 ZCOPY=""
@@ -12,11 +12,11 @@ N_IF=1
 eth_setup() {
   if test $ETH1_IP = NoThanks;
    then
-    sudo ip link set dev eth$IFN up
+    sudo ip link set dev $1 up
    else
-    sudo ip addr add $ETH1_IP/24 dev eth$IFN 
+    sudo ip addr add $ETH1_IP/24 dev $1 
    fi
-  sudo ethtool -A eth$IFN autoneg off rx off tx off
+  sudo ethtool -A $1 autoneg off rx off tx off
 }
 
 virt_lan_setup() {
@@ -80,11 +80,17 @@ while getopts i:zvpPbB:I:n:V:m: opt
  done
 
 echo VL: $VIRT_LAN
+I_LIST=$(seq $BASE $(($BASE + $N_IF - 1)))
 
 if test x$HOST_BRIDGE = xmacvtap; then
+  if test x$IFN = x;
+   then
+    echo "MACVTAP without virtual switch needs a network interface! Use \"-I\""
+    exit
+   fi
   if test x$VIRT_LAN = x;
    then
-    eth_setup
+    eth_setup eth$IFN
     IF=eth$IFN
    else
     echo Virt Lan $VIRT_LAN
@@ -92,11 +98,9 @@ if test x$HOST_BRIDGE = xmacvtap; then
     IF=$VIRT_LAN
    fi
   echo MACVTAP, $N_IF interfaces!
-  I_LIST=$(seq $BASE $(($BASE + $N_IF - 1)))
   macvtap_create_n "$I_LIST" $IF
  elif test x$HOST_BRIDGE = xbridge; then
   echo BRIDGE!
-  I_LIST=$(seq $BASE $(($BASE + $N_IF - 1)))
   bridge_create "$I_LIST" $BRIF
  else
   echo Unknown host bridge type $HOST_BRIDGE
