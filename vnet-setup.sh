@@ -67,6 +67,16 @@ bridge_add_iface() {
    done
 }
 
+is_list() {
+  TMP=$(echo $1 | cut -d ' ' -f 1 -)
+  if test "$1" = $TMP;
+   then
+    echo "No"
+   else
+    echo "Yes"
+  fi
+}
+
 while getopts i:zvpPbB:I:n:V:m: opt
  do
   echo "Opt: $opt"
@@ -91,16 +101,26 @@ echo VL: $VIRT_LAN
 I_LIST=$(seq $BASE $(($BASE + $N_IF - 1)))
 
 if test x$HOST_BRIDGE = xmacvtap; then
-  if test x$IFN = x;
-   then
-    echo "MACVTAP without virtual switch needs a network interface! Use \"-I\""
-    exit
-   fi
   if test x$VIRT_LAN = x;
    then
+    if test "x$IFN" = x;
+     then
+      echo "MACVTAP without virtual switch needs a network interface! Use \"-I\""
+      exit
+     fi
+    if test $(is_list "$IFN") = Yes;
+     then
+      echo "MACVTAP does not support more than one network interface!"
+      exit
+     fi
     eth_setup eth$IFN
     IF=eth$IFN
    else
+    if test x$IFN != x;
+     then
+      echo "MACVTAP virtual switches cannot have a network interface! Do not use \"-I\""
+      exit
+     fi
     echo Virt Lan $VIRT_LAN
     virt_lan_setup $VIRT_LAN
     IF=$VIRT_LAN
