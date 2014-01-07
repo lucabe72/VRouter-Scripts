@@ -59,6 +59,15 @@ bridge_create() {
    done
 }
 
+bridge_add_iface() {
+  for i in $1
+   do
+    sudo ip link set dev eth$i master $2
+    sudo ip link set dev eth$i promisc on
+    sudo ip link set dev eth$i up
+   done
+}
+
 while getopts i:zvpPbB:I:n:V:m: opt
  do
   echo "Opt: $opt"
@@ -102,6 +111,7 @@ if test x$HOST_BRIDGE = xmacvtap; then
  elif test x$HOST_BRIDGE = xbridge; then
   echo BRIDGE!
   bridge_create "$I_LIST" $BRIF
+  bridge_add_iface "$IFN" $BRIF
  else
   echo Unknown host bridge type $HOST_BRIDGE
  fi
