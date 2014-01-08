@@ -30,6 +30,7 @@ load_kvm
  
 sudo chown $MYSELF /dev/kvm
 sudo chown $MYSELF /dev/vhost-net
+sudo chown $MYSELF /dev/tun
 for TAP_N in $LIST
  do
   sudo chown $MYSELF /dev/tap$TAP_N

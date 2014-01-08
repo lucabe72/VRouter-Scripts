@@ -9,7 +9,7 @@ MAC_PREFIX=00:16:35:AF:94:4
 N_IF=1
 
 OVS_HOME=/home/vrouter/Public-OpenVSwitch
-export PATH=$PATH:$OVS_HOME/sbin:$OVS_HOME/bin
+export PATH=/home/vrouter/bin:$PATH:$OVS_HOME/sbin:$OVS_HOME/bin
 
 ovs_setup() {
   sudo /sbin/modprobe openvswitch
@@ -145,6 +145,14 @@ while getopts i:zvpPbB:I:n:V:m:O: opt
 
 echo VL: $VIRT_LAN
 I_LIST=$(seq $BASE $(($BASE + $N_IF - 1)))
+
+if [ ! -f /dev/net ];
+ then 
+  sudo mkdir -p       /dev/net
+  sudo ln -s /dev/tun /dev/net/tun
+  sudo chown $MYSELF  /dev/net/tun
+ fi
+
 
 if test x$HOST_BRIDGE = xmacvtap; then
   if test x$VIRT_LAN = x;
