@@ -114,7 +114,7 @@ is_list() {
 }
 
 is_running() {
-  if test echo $(ps ax | grep $1 | wc -l) = 2;
+  if test $(echo $(ps ax | grep $1 | wc -l)) = 2;
    then
     echo Yes
    else
@@ -177,7 +177,7 @@ if test x$HOST_BRIDGE = xmacvtap; then
   echo BRIDGE!
   bridge_create "$I_LIST" $BRIF
   bridge_add_iface "$IFN" $BRIF
- elif test x$HOST_BRIDGE = ovs; then
+ elif test x$HOST_BRIDGE = xovs; then
   echo OpenVswitch!
   if test $(is_running ovs-vswitchd) = No;
    then
