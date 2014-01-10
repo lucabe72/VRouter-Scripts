@@ -7,6 +7,7 @@ HOST_BRIDGE="macvtap"
 QLEN=1000 #FIXME!
 MAC_PREFIX=00:16:35:AF:94:4
 N_IF=1
+MYSELF=$USER
 
 OVS_HOME=/home/vrouter/Public-OpenVSwitch
 export PATH=/home/vrouter/bin:$PATH:$OVS_HOME/sbin:$OVS_HOME/bin
@@ -31,7 +32,6 @@ eth_setup() {
 }
 
 virt_lan_setup() {
-#  MYSELF=$USER
 #  sudo /usr/sbin/tunctl -u $MYSELF -b -t $1
   sudo ip link add name $1 type dummy
   sudo ip link set dev $1 up
@@ -52,7 +52,6 @@ macvtap_create_n() {
 }
 
 bridge_create() {
-  MYSELF=$USER
   sudo /sbin/modprobe vhost-net $ZCOPY
 
 #  sudo /sbin/brctl addbr $2
@@ -80,7 +79,6 @@ bridge_add_iface() {
 }
 
 ovs_create() {
-  MYSELF=$USER
   sudo /sbin/modprobe vhost-net $ZCOPY
 
   sudo ovs-vsctl add-br $2 
