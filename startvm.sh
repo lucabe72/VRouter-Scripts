@@ -13,6 +13,7 @@ CORE=Core/boot/core.gz
 GUEST_IMG=""
 TUNTAP=""
 OPT="opt1.img"
+SMP=1
 OPTQCOW=""
 
 echo $APPEND
@@ -125,7 +126,7 @@ get_n() {
    done
 }
 
-while getopts v:t:kKnNei:l:c:g:C:E:o:I:p:a:q:f:x: opt
+while getopts v:t:kKnNei:l:c:g:C:E:o:I:s:p:a:q:f:x: opt
  do
   echo "Opt: $opt"
   case "$opt" in
@@ -144,6 +145,7 @@ while getopts v:t:kKnNei:l:c:g:C:E:o:I:p:a:q:f:x: opt
     c)		CORE=$OPTARG;;
     g)		GUEST_IMG=$OPTARG;;
     o)		OPT=$OPTARG;;
+    s)		SMP=$OPTARG;;
     q)		OPTQCOW=$OPTARG;;
     f)		FSDEV_DIR=$OPTARG;;
     p)          NETMAPBASE=$OPTARG;;
@@ -176,6 +178,7 @@ if test x$GUEST_IMG = x;
  else
   GUEST_CMD="-hda $GUEST_IMG"
  fi
+GUEST_CMD="$GUEST_CMD -smp $SMP"
 
 if test x$FSDEV_DIR != x;
  then
