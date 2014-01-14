@@ -75,7 +75,15 @@ bridge_add_iface() {
     sudo ip link set dev eth$i master $2
     sudo ip link set dev eth$i promisc on
     sudo ip link set dev eth$i up
+    if test "x$3" != "x";
+     then
+      sudo ip addr del $3/24 dev eth$i
+     fi
    done
+  if test "x$3" != "x";
+   then
+    sudo ip addr add $3/24 dev $2
+   fi
 }
 
 ovs_create() {
@@ -182,7 +190,7 @@ if test x$HOST_BRIDGE = xmacvtap; then
  elif test x$HOST_BRIDGE = xbridge; then
   echo BRIDGE!
   bridge_create "$I_LIST" $BRIF
-  bridge_add_iface "$IFN" $BRIF
+  bridge_add_iface "$IFN" $BRIF $ETH1_IP
  elif test x$HOST_BRIDGE = xovs; then
   echo OpenVswitch!
   if test $(is_running ovs-vswitchd) = No;
