@@ -53,7 +53,7 @@ build_netcfg_tuntap() {
     ID=$(echo ${i##*[a-z]})
     if test $ID -le 9
      then
-      MACADDR=00:16:35:AF:94:0$ID
+      MACADDR=00:16:35:AF:94:4$ID
      else
       MACADDR=00:16:35:AF:94:$ID
      fi
@@ -71,7 +71,7 @@ CFG=""
     ID=$(echo ${i##*[a-z]})
     if test $ID -le 9
      then
-      MACADDR=00:16:35:AF:94:0$ID
+      MACADDR=00:16:35:AF:94:4$ID
      else
       MACADDR=00:16:35:AF:94:$ID
      fi
