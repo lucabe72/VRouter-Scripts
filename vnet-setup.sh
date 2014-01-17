@@ -49,6 +49,12 @@ macvtap_create_n() {
 #    sudo /sbin/ifconfig macvtap$i txqueuelen $QLEN
 #    sudo ip link set dev macvtap$i txqueuelen $QLEN
   done
+
+  LIST=$(ip link show | grep macvtap | cut -d ':' -f 1)
+  for TAP_N in $LIST
+   do
+    sudo chown $MYSELF /dev/tap$TAP_N
+   done
 }
 
 bridge_create() {
