@@ -38,7 +38,7 @@ for kvmpid in $kvmpids
  do
   vhostpids="$vhostpids "`ps ax | grep [v]host-$kvmpid | cut -c 1-6`
   tmp=$(ls /proc/$kvmpid/task)
-  vcpupids="$vcpupids "$(echo $tmp | cut -d ' ' -f 2)
+  vcpupids="$vcpupids "$(echo $tmp | cut -d ' ' -f 2-)
  done
 
 echo vhost PIDs: $vhostpids
@@ -46,7 +46,9 @@ echo vcpu PIDs: $vcpupids
 
 for vcpupid in $vcpupids
  do
-  sudo taskset -p $VCPUAFFINITY $vcpupid
+  AFF=$(echo $VCPUAFFINITY | cut -d ' ' -f 1)
+  sudo taskset -p $AFF $vcpupid
+  VCPUAFFINITY=$(echo $VCPUAFFINITY | cut -d ' ' -f 2-)
   if [ x$VCPUBUDGET = x ]
    then
     if [ $VCPUPRIORITY = "0" ];
@@ -62,7 +64,9 @@ for vcpupid in $vcpupids
 
 for vhostpid in $vhostpids
  do
-  sudo taskset -p $VHOSTAFFINITY $vhostpid
+  AFF=$(echo $VHOSTAFFINITY | cut -d ' ' -f 1)
+  sudo taskset -p $AFF $vhostpid
+  VHOSTAFFINITY=$(echo $VHOSTAFFINITY | cut -d ' ' -f 2-)
   if [ x$VHOSTBUDGET = x ]
    then
     if [ $VHOSTPRIORITY = "0" ];
