@@ -38,7 +38,7 @@ for kvmpid in $kvmpids
  do
   vhostpids="$vhostpids "`ps ax | grep [v]host-$kvmpid | cut -c 1-6`
   tmp=$(ls /proc/$kvmpid/task)
-  vcpupids="$vcpupids "$(echo $tmp | cut -d ' ' -f 2-)
+  vcpupids="$vcpupids "$(echo $tmp | cut -d ' ' -f 2)
  done
 
 echo vhost PIDs: $vhostpids
